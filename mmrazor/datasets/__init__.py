@@ -2,4 +2,6 @@
 from .crd_dataset_wrapper import CRDDataset
 from .transforms import AutoAugment, AutoAugmentV2, PackCRDClsInputs
 
-__all__ = ['AutoAugment', 'AutoAugmentV2', 'PackCRDClsInputs', 'CRDDataset']
+__all__ = ['AutoAugment', 'AutoAugmentV2', 'PackCRDClsInputs', 'CRDDataset',
+           'BaseDataset', 'CIFAR10', 'CIFAR100'
+        ]

@@ -8,10 +8,12 @@ from .mgd_connector import MGDConnector
 from .norm_connector import NormConnector
 from .ofd_connector import OFDTeacherConnector
 from .torch_connector import TorchFunctionalConnector, TorchNNConnector
+from .xfd_connector import Conv2TranConnector, Tran2ConvConnector, RMClsTokenConnector
 
 __all__ = [
     'ConvModuleConnector', 'Translator', 'Paraphraser', 'BYOTConnector',
     'FBKDTeacherConnector', 'FBKDStudentConnector', 'TorchFunctionalConnector',
     'CRDConnector', 'TorchNNConnector', 'OFDTeacherConnector', 'MGDConnector',
-    'NormConnector'
+    'NormConnector',
+    'Conv2TranConnector', 'Tran2ConvConnector', 'RMClsTokenConnector'
 ]

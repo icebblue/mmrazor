@@ -1,0 +1,134 @@
+Collections:
+  - Name: XFD
+    Metadata:
+      Training Data:
+        - CIFAR-10
+    Paper:
+      URL: https://arxiv.org/abs/1412.6550
+      Title: FitNets- Hints for Thin Deep Nets
+    README: configs/distill/mmcls/xfd/README.md
+Models:
+  - Name: xfd_backbone_vit-small_resnet50_4x256b_cifar10
+    In Collection: XFD
+    Metadata:
+      inference time (ms/im):
+        - value: 0.18
+          hardware: NVIDIA A100-SXM4-80GB
+          backend: PyTorch
+          batch size: 32
+          mode: FP32
+          resolution: (224, 224)
+      Location: backbone & logits
+      Student:
+        Config: mmrazor::vanilla/mmcls/resnet/resnet50_4xb256_cifar10.py
+        Weights: https://download.openmmlab.com/mmclassification/v0/resnet/resnet50_8xb32_in1k_20210831-ea4938fc.pth
+        Metrics:
+          Top 1 Accuracy: 76.55
+          Top 5 Accuracy: 93.06
+      Teacher:
+        Config: mmrazor::vanilla/mmcls/vit/vit-small_4xb256_cifar10.py
+        Weights: https://download.openmmlab.com/mmclassification/v0/resnet/resnet50_8xb32_in1k_20210831-ea4938fc.pth
+        Metrics:
+          Top 1 Accuracy: 76.55
+          Top 5 Accuracy: 93.06
+    Results:
+      - Task: Image Classification
+        Dataset: CIFAR-10
+        Metrics:
+          Top 1 Accuracy: 70.58
+    Config: configs/distill/mmcls/xfd/xfd_backbone_vit-small_resnet50_4x256b_cifar10.py
+    Weights: https://download.openmmlab.com/mmrazor/v1/FieNets/fitnets_backbone_logits_resnet50_resnet18_8xb32_in1k_20220830_155608-00ccdbe2.pth
+  
+  - Name: xfd_backbone_resnet50_vit-small_4x256b_cifar10
+    In Collection: XFD
+    Metadata:
+      inference time (ms/im):
+        - value: 0.18
+          hardware: NVIDIA A100-SXM4-80GB
+          backend: PyTorch
+          batch size: 32
+          mode: FP32
+          resolution: (224, 224)
+      Location: backbone & logits
+      Student:
+        Config: mmrazor::vanilla/mmcls/vit/vit-small_4xb256_cifar10.py
+        Weights: https://download.openmmlab.com/mmclassification/v0/resnet/resnet50_8xb32_in1k_20210831-ea4938fc.pth
+        Metrics:
+          Top 1 Accuracy: 76.55
+          Top 5 Accuracy: 93.06
+      Teacher:
+        Config: mmrazor::vanilla/mmcls/resnet/resnet50_4xb256_cifar10.py
+        Weights: https://download.openmmlab.com/mmclassification/v0/resnet/resnet50_8xb32_in1k_20210831-ea4938fc.pth
+        Metrics:
+          Top 1 Accuracy: 76.55
+          Top 5 Accuracy: 93.06
+    Results:
+      - Task: Image Classification
+        Dataset: CIFAR-10
+        Metrics:
+          Top 1 Accuracy: 70.58
+    Config: configs/distill/mmcls/xfd/xfd_backbone_resnet50_vit-small_4x256b_cifar10.py
+    Weights: https://download.openmmlab.com/mmrazor/v1/FieNets/fitnets_backbone_logits_resnet50_resnet18_8xb32_in1k_20220830_155608-00ccdbe2.pth
+
+  - Name: xfd_backbone_resnet50_vit-small_2x128b_cifar100
+    In Collection: XFD
+    Metadata:
+      inference time (ms/im):
+        - value: 0.18
+          hardware: NVIDIA A100-SXM4-80GB
+          backend: PyTorch
+          batch size: 32
+          mode: FP32
+          resolution: (224, 224)
+      Location: backbone & logits
+      Student:
+        Config: mmrazor::vanilla/mmcls/vit/vit-small_2xb128_cifar100.py
+        Weights: https://download.openmmlab.com/mmclassification/v0/resnet/resnet50_8xb32_in1k_20210831-ea4938fc.pth
+        Metrics:
+          Top 1 Accuracy: 76.55
+          Top 5 Accuracy: 93.06
+      Teacher:
+        Config: mmrazor::vanilla/mmcls/resnet/resnet50_2xb128_cifar100.py
+        Weights: https://download.openmmlab.com/mmclassification/v0/resnet/resnet50_8xb32_in1k_20210831-ea4938fc.pth
+        Metrics:
+          Top 1 Accuracy: 76.55
+          Top 5 Accuracy: 93.06
+    Results:
+      - Task: Image Classification
+        Dataset: CIFAR-100
+        Metrics:
+          Top 1 Accuracy: 70.58
+    Config: configs/distill/mmcls/xfd/xfd_backbone_resnet50_vit-small_2x128b_cifar100.py
+    Weights: https://download.openmmlab.com/mmrazor/v1/FieNets/fitnets_backbone_logits_resnet50_resnet18_8xb32_in1k_20220830_155608-00ccdbe2.pth
+
+  - Name: xfd_backbone_vit-small_resnet50_2x128b_cifar100
+    In Collection: XFD
+    Metadata:
+      inference time (ms/im):
+        - value: 0.18
+          hardware: NVIDIA A100-SXM4-80GB
+          backend: PyTorch
+          batch size: 32
+          mode: FP32
+          resolution: (224, 224)
+      Location: backbone & logits
+      Student:
+        Config: mmrazor::vanilla/mmcls/resnet/resnet50_2xb128_cifar100.py
+        Weights: https://download.openmmlab.com/mmclassification/v0/resnet/resnet50_8xb32_in1k_20210831-ea4938fc.pth
+        Metrics:
+          Top 1 Accuracy: 76.55
+          Top 5 Accuracy: 93.06
+      Teacher:
+        Config: mmrazor::vanilla/mmcls/vit/vit-small_2xb128_cifar100.py
+        Weights: https://download.openmmlab.com/mmclassification/v0/resnet/resnet50_8xb32_in1k_20210831-ea4938fc.pth
+        Metrics:
+          Top 1 Accuracy: 76.55
+          Top 5 Accuracy: 93.06
+    Results:
+      - Task: Image Classification
+        Dataset: CIFAR-100
+        Metrics:
+          Top 1 Accuracy: 70.58
+    Config: configs/distill/mmcls/xfd/xfd_backbone_vit-small_resnet50_2x128b_cifar100.py
+    Weights: https://download.openmmlab.com/mmrazor/v1/FieNets/fitnets_backbone_logits_resnet50_resnet18_8xb32_in1k_20220830_155608-00ccdbe2.pth
+  
