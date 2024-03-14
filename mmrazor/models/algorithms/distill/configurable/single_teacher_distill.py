@@ -42,6 +42,7 @@ class SingleTeacherDistill(BaseAlgorithm):
                  teacher_ckpt: Optional[str] = None,
                  teacher_trainable: bool = False,
                  teacher_norm_eval: bool = True,
+                 student_ckpt: Optional[str] = None,
                  student_trainable: bool = True,
                  calculate_student_loss: bool = True,
                  teacher_module_inplace: bool = False,
@@ -75,6 +76,9 @@ class SingleTeacherDistill(BaseAlgorithm):
             for param in self.teacher.parameters():
                 param.requires_grad = False
         self.teacher_norm_eval = teacher_norm_eval
+
+        if student_ckpt:
+            _ = load_checkpoint(self.architecture, student_ckpt, revise_keys=[(r'^architecture\.', '')])
 
         # The student model will not calculate gradients and update parameters
         # in some pretraining process.

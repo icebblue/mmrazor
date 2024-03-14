@@ -48,7 +48,7 @@ class MGDLoss(nn.Module):
         Return:
             torch.Tensor: The calculated mse distance value.
         """
-        N, C, H, W = preds_T.shape
+        N = preds_T.shape[0]
         dis_loss = self.loss_mse(preds_S, preds_T) / N
 
         return dis_loss

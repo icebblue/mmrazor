@@ -7,12 +7,8 @@ from mmrazor.registry import MODELS
 
 
 @MODELS.register_module()
-class ATLoss(nn.Module):
-    """"Paying More Attention to Attention: Improving the Performance of
-    Convolutional Neural Networks via Attention Transfer" Conference paper at
-    ICLR2017 https://openreview.net/forum?id=Sks9_ajex.
-
-    https://github.com/szagoruyko/attention-transfer/blob/master/utils.py
+class MSELoss(nn.Module):
+    """Calculate the two-norm loss between the two features.
 
     Args:
         loss_weight (float): Weight of loss. Defaults to 1.0.
@@ -23,11 +19,15 @@ class ATLoss(nn.Module):
         loss_weight: float = 1.0,
     ) -> None:
         super().__init__()
+        self.loss_mse = nn.MSELoss()
         self.loss_weight = loss_weight
 
-    def forward(self, s_feature: torch.Tensor,
-                t_feature: torch.Tensor) -> torch.Tensor:
-        """"Forward function for ATLoss."""
+    def forward(
+        self,
+        s_feature: torch.Tensor,
+        t_feature: torch.Tensor,
+    ) -> torch.Tensor:
+        
         if s_feature.dim() == 4: # B x C x H x W
             s_H, t_H = s_feature.size(2), t_feature.size(2)
 
@@ -48,25 +48,10 @@ class ATLoss(nn.Module):
                 s_feature = F.adaptive_avg_pool3d(s_feature, (t_T, None, None))
             elif s_H < t_H:
                 t_feature = F.adaptive_avg_pool3d(t_feature, (s_T, None, None))
+        assert s_feature.size() == t_feature.size(), f"{s_feature.size()} != {t_feature.size()}"
         
-        if s_feature.dim() == 4:
-            loss = (self.calc_attention_matrix(s_feature) -
-                    self.calc_attention_matrix(t_feature)).pow(2).mean()
-        elif s_feature.dim() == 5:
-            loss = (self.calc_attention_matrix(s_feature) -
-                    self.calc_attention_matrix(t_feature)).pow(2).sum(1).mean()
-            
+        loss = self.loss_mse(s_feature, t_feature)
+
         return self.loss_weight * loss
 
-    def calc_attention_matrix(self, x: torch.Tensor) -> torch.Tensor:
-        """"Calculate the attention matrix.
-
-        Args:
-            x (torch.Tensor): Input features.
-        """
-        if x.dim() == 4: # B x C x H x W
-            return F.normalize(x.pow(2).mean(1).view(x.size(0), -1))
-        elif x.dim() == 5: # B x C x T x H x W
-            B, T = x.size(0), x.size(2)
-            return F.normalize(x.pow(2).mean(1).view(B*T, -1)).view(B, T, -1)
-            
+    
