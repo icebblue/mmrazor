@@ -1,0 +1,39 @@
+_base_ = ['mmaction::/']
+
+student = _base_.model
+teacher_ckpt = '/'
+
+data_preprocessor=dict(
+    type='mmaction.ActionDataPreprocessor',
+    mean=[123.675, 116.28, 103.53],
+    std=[58.395, 57.12, 57.375],
+    format_shape='NCTHW')
+
+ce_loss_weight=0.5
+
+model = dict(
+    _scope_='mmrazor',
+    _delete_=True,
+    type='SingleTeacherDistill',
+    data_preprocessor=data_preprocessor,
+    architecture=student,
+    ce_loss_weight=ce_loss_weight,
+    teacher=dict(
+        cfg_path='mmaction::/', pretrained=False),
+    teacher_ckpt=teacher_ckpt,
+    distiller=dict(
+        type='ConfigurableDistiller',
+        student_recorders=dict(
+            fc=dict(type='ModuleOutputs', source='cls_head.fc_cls')),
+        teacher_recorders=dict(
+            fc=dict(type='ModuleOutputs', source='cls_head.fc_cls')),
+        distill_losses=dict(
+            loss_kl=dict(type='KLDivergence', tau=4, loss_weight=1.0 - ce_loss_weight,)),
+        loss_forward_mappings=dict(
+            loss_kl=dict(
+                preds_S=dict(from_student=True, recorder='fc'),
+                preds_T=dict(from_student=False, recorder='fc')))))
+
+find_unused_parameters = True
+
+val_cfg = dict(_delete_=True, type='mmrazor.SingleTeacherDistillValLoop')

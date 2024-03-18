@@ -130,7 +130,7 @@ class SingleTeacherDistill(BaseAlgorithm):
         # Original task loss will not be used during some pretraining process.
         if self.calculate_student_loss:
             with self.distiller.student_recorders, self.distiller.deliveries:
-                student_losses = self.student(
+                student_losses = self.ce_loss_weight * self.student(
                     batch_inputs, data_samples, mode='loss')
             losses.update(add_prefix(student_losses, 'student'))
         else:

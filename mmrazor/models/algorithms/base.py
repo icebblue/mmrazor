@@ -58,6 +58,7 @@ class BaseAlgorithm(BaseModel):
     def __init__(self,
                  architecture: Union[BaseModel, Dict],
                  data_preprocessor: Optional[Union[Dict, nn.Module]] = None,
+                 ce_loss_weight: float = 1.0,
                  init_cfg: Optional[Dict] = None,
                  module_inplace: bool = False) -> None:
 
@@ -82,6 +83,8 @@ class BaseAlgorithm(BaseModel):
         # Cannot assign module before Module.__init__()
         self.architecture = architecture
 
+        self.ce_loss_weight = ce_loss_weight
+        
         # Find all nn.Modules in the model that contain the 'inplace' attribute
         # and set them to False
         self.module_inplace = module_inplace
