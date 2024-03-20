@@ -12,12 +12,14 @@ data_preprocessor=dict(
 model = dict(
     _scope_='mmrazor',
     _delete_=True,
-    type='SingleTeacherDistill',
+    type='HetTeacherDistill',
     data_preprocessor=data_preprocessor,
     architecture=student,
     teacher=dict(
         cfg_path='mmaction::/mnt/cephfs/home/zengrunhao/yangzehang/workplace/mmaction2/configs/recognition/swin/swin-tiny-p244-w877_k400-pre_4xb4-16x4x1-50e_ucf101-rgb.py', pretrained=False),
     teacher_ckpt=teacher_ckpt,
+    frames_downsample_rate=4,
+    is_teacher_downsample=True,
     distiller=dict(
         type='ConfigurableDistiller',
         student_recorders=dict(
@@ -25,7 +27,14 @@ model = dict(
         teacher_recorders=dict(
             fc=dict(type='ModuleOutputs', source='cls_head.fc_cls')),
         distill_losses=dict(
-            loss_kl=dict(type='KLDivergence', tau=4, loss_weight=1)),
+            loss_kl=dict(
+                type='CTKD', 
+                cosine_decay=True,
+                decay_max=0,
+                decay_min=-1,
+                decay_loops=5,
+                max_iter=597,
+                loss_weight=1)),
         loss_forward_mappings=dict(
             loss_kl=dict(
                 preds_S=dict(from_student=True, recorder='fc'),

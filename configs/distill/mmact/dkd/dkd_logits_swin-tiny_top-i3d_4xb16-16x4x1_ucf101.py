@@ -12,24 +12,34 @@ data_preprocessor=dict(
 model = dict(
     _scope_='mmrazor',
     _delete_=True,
-    type='SingleTeacherDistill',
+    type='HetTeacherDistill',
     data_preprocessor=data_preprocessor,
     architecture=student,
     teacher=dict(
         cfg_path='mmaction::/mnt/cephfs/home/zengrunhao/yangzehang/workplace/mmaction2/configs/recognition/swin/swin-tiny-p244-w877_k400-pre_4xb4-16x4x1-50e_ucf101-rgb.py', pretrained=False),
     teacher_ckpt=teacher_ckpt,
+    frames_downsample_rate=4,
+    is_teacher_downsample=True,
     distiller=dict(
         type='ConfigurableDistiller',
         student_recorders=dict(
-            fc=dict(type='ModuleOutputs', source='cls_head.fc_cls')),
+            fc=dict(type='ModuleOutputs', source='cls_head.fc_cls'),
+            gt_labels=dict(type='ModuleInputs', source='cls_head.loss_cls')),
         teacher_recorders=dict(
             fc=dict(type='ModuleOutputs', source='cls_head.fc_cls')),
         distill_losses=dict(
-            loss_kl=dict(type='KLDivergence', tau=4, loss_weight=1)),
+            loss_dkd=dict(
+                type='DKDLoss',
+                tau=4,
+                beta=0.5,
+                loss_weight=1,
+                reduction='batchmean')),
         loss_forward_mappings=dict(
-            loss_kl=dict(
+            loss_dkd=dict(
                 preds_S=dict(from_student=True, recorder='fc'),
-                preds_T=dict(from_student=False, recorder='fc')))))
+                preds_T=dict(from_student=False, recorder='fc'),
+                gt_labels=dict(
+                    recorder='gt_labels', from_student=True, data_idx=1)))))
 
 find_unused_parameters = True
 

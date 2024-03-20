@@ -2,7 +2,7 @@ PORT=29666 nohup bash tools/dist_train.sh configs/distill/mmact/kd/kd_logits_mvi
 
 PORT=29666 nohup bash tools/dist_train.sh configs/distill/mmact/kd/kd_logits_mvit_r2plus1d_4xb8_ucf101.py 4 >nohup.log 2>&1 &
 
-PORT=29666 nohup bash tools/dist_train.sh configs/distill/mmact/kd/kd_logits_i3d_top-i3d_4xb4-64x1x1_ucf101.py 4 >nohup.log 2>&1 &
+PORT=29666 bash tools/dist_train.sh configs/distill/mmact/kd/kd_logits_i3d_top-i3d_4xb16_ucf101.py 4 >nohup.log 2>&1
 
 PORT=29777 nohup bash tools/dist_train.sh configs/distill/mmact/kd/kd_logits_swin-tiny_top-i3d_4xb4-64x1x1_ucf101.py 4 >nohup.log 2>&1 &
 
@@ -33,3 +33,39 @@ PORT=29666 nohup bash tools/dist_train.sh configs/distill/mmact/dkd/dkd_logits_i
 
 
 PORT=29777 nohup bash tools/dist_test.sh configs/distill/mmact/dkd/dkd_logits_i3d_top-i3d_4xb4-64x1x1_ucf101.py ./work_dirs/dkd_logits_i3d_top-i3d_4xb4-64x1x1_ucf101/best_acc_top1_epoch_88.pth 4 >nohup_test.log 2>&1 &
+
+
+//24.3.17
+//kd_logits_i3d_top
+//同构
+PORT=29999 bash tools/dist_train.sh configs/distill/mmact/kd/kd_logits_i3d_top-i3d_4xb16_ucf101.py 4 >nohup_1.log 2>&1
+
+CUDA_VISIBLE_DEVICES=4,5,6,7 PORT=29777 bash tools/dist_train.sh configs/distill/mmact/dkd/dkd_logits_i3d_top-i3d_4xb16-16x4x1_ucf101.py 4 >nohup_2.log 2>&1
+
+PORT=29888 bash tools/dist_train.sh configs/distill/mmact/ctkd/ctkd_logits_i3d_top-i3d_4xb16_ucf101.py 4 >nohup_3.log 2>&1
+
+//异构
+
+CUDA_VISIBLE_DEVICES=4,5,6,7 PORT=29888 bash tools/dist_train.sh configs/distill/mmact/kd/kd_logits_swin-tiny_top-i3d_4xb16_ucf101.py 4 >nohup_2.log 2>&1
+
+PORT=29777 bash tools/dist_train.sh configs/distill/mmact/ctkd/ctkd_logits_swin-tiny_top-i3d_4xb16-16x4x1_ucf101.py 4 >nohup_1.log 2>&1
+
+PORT=29666 bash tools/dist_train.sh configs/distill/mmact/dkd/dkd_logits_swin-tiny_top-i3d_4xb16-16x4x1_ucf101.py 4 >nohup.log 2>&1
+
+PORT=29777 bash tools/dist_train.sh configs/distill/mmact/kd/kd_logits_swin-tiny_top-i3d_4xb16_ucf101.py 4 >nohup_2.log 2>&1
+
+PORT=29666 bash tools/dist_train.sh configs/distill/mmact/kd/kd_logits_swin-tiny_top-i3d_4xb16_ucf101.py 4 >nohup.log 2>&1
+
+//feature_based
+//3.19
+
+PORT=29777 bash tools/dist_train.sh configs/distill/mmact/atkd/atkd_backbone_swin-tiny_top-i3d_4xb4-64x1x1_ucf101.py 4 >nohup_1.log 2>&1
+
+CUDA_VISIBLE_DEVICES=4,5,6,7 PORT=29666 bash tools/dist_train.sh configs/distill/mmact/atkd/atkd_backbone_logits_swin-tiny_top-i3d_4xb4-64x1x1_ucf101.py 4 >nohup_2.log 2>&1
+
+PORT=29666 bash tools/dist_train.sh configs/distill/mmact/mgd/mgd_backbone_swin-tiny_top-i3d_4xb4-64x1x1_ucf101.py 4 >nohup.log 2>&1
+
+configs/distill/mmact/mgd/mgd_backbone_swin-tiny_top-i3d_4xb4-64x1x1_ucf101.py
+
+CUDA_VISIBLE_DEVICES=1,2,4,5,6,7 PORT=29666 bash tools/dist_train.sh configs/distill/mmact/simkd/simkd_backbone_swin-tiny_top-i3d_4xb4-64x1x1_ucf101.py 4 >nohup_test.log 2>&1
+
