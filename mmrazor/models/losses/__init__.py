@@ -21,11 +21,12 @@ from .weighted_soft_label_distillation import WSLD
 from .mse_loss import MSELoss
 from .ctkd import CTKD
 from .js_divergence import JSDivergence
+from .simple_loss import SimLoss
 
 __all__ = [
     'ChannelWiseDivergence', 'KLDivergence', 'AngleWiseRKD', 'DistanceWiseRKD',
     'WSLD', 'L2Loss', 'ABLoss', 'DKDLoss', 'KDSoftCELoss', 'ActivationLoss',
     'OnehotLikeLoss', 'InformationEntropyLoss', 'FTLoss', 'ATLoss', 'OFDLoss',
     'L1Loss', 'FBKDLoss', 'CRDLoss', 'CrossEntropyLoss', 'PKDLoss', 'MGDLoss',
-    'DISTLoss', 'MSELoss', 'CTKD', 'JSDivergence'
+    'DISTLoss', 'MSELoss', 'CTKD', 'JSDivergence', 'SimLoss'
 ]
