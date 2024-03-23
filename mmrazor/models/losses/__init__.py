@@ -22,11 +22,12 @@ from .mse_loss import MSELoss
 from .ctkd import CTKD
 from .js_divergence import JSDivergence
 from .simple_loss import SimLoss
+from .comkd_loss import ComKDLoss
 
 __all__ = [
     'ChannelWiseDivergence', 'KLDivergence', 'AngleWiseRKD', 'DistanceWiseRKD',
     'WSLD', 'L2Loss', 'ABLoss', 'DKDLoss', 'KDSoftCELoss', 'ActivationLoss',
     'OnehotLikeLoss', 'InformationEntropyLoss', 'FTLoss', 'ATLoss', 'OFDLoss',
     'L1Loss', 'FBKDLoss', 'CRDLoss', 'CrossEntropyLoss', 'PKDLoss', 'MGDLoss',
-    'DISTLoss', 'MSELoss', 'CTKD', 'JSDivergence', 'SimLoss'
+    'DISTLoss', 'MSELoss', 'CTKD', 'JSDivergence', 'SimLoss', 'ComKDLoss'
 ]
