@@ -26,10 +26,10 @@ model = dict(
             bb_s3=dict(type='ModuleOutputs', source='backbone.layer3.5.conv3.conv'),
             bb_s4=dict(type='ModuleOutputs', source='backbone.layer4.2.conv3.conv')),
         teacher_recorders=dict(
-            bb_s1=dict(type='ModuleOutputs', source='backbone.transformer_layers.layers.1.ffns'),
-            bb_s2=dict(type='ModuleOutputs', source='backbone.transformer_layers.layers.3.ffns'),
-            bb_s3=dict(type='ModuleOutputs', source='backbone.transformer_layers.layers.9.ffns'),
-            bb_s4=dict(type='ModuleOutputs', source='backbone.transformer_layers.layers.11.ffns')),
+            bb_s1=dict(type='ModuleOutputs', source='backbone.transformer_layers.layers.1.ffns.0.layers.1'),
+            bb_s2=dict(type='ModuleOutputs', source='backbone.transformer_layers.layers.3.ffns.0.layers.1'),
+            bb_s3=dict(type='ModuleOutputs', source='backbone.transformer_layers.layers.9.ffns.0.layers.1'),
+            bb_s4=dict(type='ModuleOutputs', source='backbone.transformer_layers.layers.11.ffns.0.layers.1')),
         distill_losses=dict(
             loss_s1=dict(type='MSELoss', loss_weight=1),
             loss_s2=dict(type='MSELoss', loss_weight=1),

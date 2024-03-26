@@ -9,15 +9,12 @@ data_preprocessor=dict(
     std=[58.395, 57.12, 57.375],
     format_shape='NCTHW')
 
-ce_loss_weight=0.5
-
 model = dict(
     _scope_='mmrazor',
     _delete_=True,
     type='SingleTeacherDistill',
     data_preprocessor=data_preprocessor,
     architecture=student,
-    ce_loss_weight=ce_loss_weight,
     teacher=dict(
         cfg_path='mmaction::/', pretrained=False),
     teacher_ckpt=teacher_ckpt,
@@ -28,7 +25,7 @@ model = dict(
         teacher_recorders=dict(
             fc=dict(type='ModuleOutputs', source='cls_head.fc_cls')),
         distill_losses=dict(
-            loss_kl=dict(type='KLDivergence', tau=4, loss_weight=1.0 - ce_loss_weight,)),
+            loss_kl=dict(type='KLDivergence', tau=4, loss_weight=1.0)),
         loss_forward_mappings=dict(
             loss_kl=dict(
                 preds_S=dict(from_student=True, recorder='fc'),
