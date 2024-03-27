@@ -1,7 +1,7 @@
-_base_ = ['mmaction::/mnt/cephfs/home/zengrunhao/yangzehang/workplace/mmaction2/configs/recognition/i3d/i3d_k400-pretrained_4xb16-16x4x1-50e_ucf101-rgb.py']
+_base_ = ['mmaction::/mnt/cephfs/home/zengrunhao/pengying/mmaction2/configs/recognition/i3d/i3d_k400-pretrained_4xb16-16x4x1-50e_ucf101-rgb.py']
 
 student = _base_.model
-teacher_ckpt = '/mnt/cephfs/dataset/zehang/checkpoints/mmaction2/mvit-small-p244_k400-pre_8xb4-16x4x1-50e_ucf101-rgb/best_acc_top1_epoch_10.pth'
+teacher_ckpt = '/mnt/cephfs/dataset/m3lab_data-z/pengying/checkpoints/mmaction2/mvit-small-p244_k400-pre_8xb4-16x4x1-50e_ucf101-rgb/best_acc_top1_epoch_10.pth'
 
 data_preprocessor=dict(
     type='mmaction.ActionDataPreprocessor',
@@ -16,7 +16,7 @@ model = dict(
     data_preprocessor=data_preprocessor,
     architecture=student,
     teacher=dict(
-        cfg_path='mmaction::/mnt/cephfs/home/zengrunhao/yangzehang/workplace/mmaction2/configs/recognition/mvit/mvit-small-p244_k400-pre_8xb4-16x4x1-50e_ucf101-rgb.py', pretrained=False),
+        cfg_path='mmaction::/mnt/cephfs/home/zengrunhao/pengying/mmaction2/configs/recognition/mvit/mvit-small-p244_k400-pre_8xb4-16x4x1-50e_ucf101-rgb.py', pretrained=False),
     teacher_ckpt=teacher_ckpt,
     distiller=dict(
         type='ConfigurableDistiller',

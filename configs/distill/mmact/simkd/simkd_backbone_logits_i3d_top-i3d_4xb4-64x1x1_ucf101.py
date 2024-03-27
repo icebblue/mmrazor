@@ -37,15 +37,22 @@ model = dict(
     distiller=dict(
         type='ConfigurableDistiller',
         student_recorders=dict(
-            bb_s4=dict(type='ModuleOutputs', source='cls_head.transfer'),),
+            bb_s4=dict(type='ModuleOutputs', source='cls_head.transfer'),
+            fc=dict(type='ModuleOutputs', source='cls_head.fc_cls')),
         teacher_recorders=dict(
-            bb_s4=dict(type='ModuleOutputs', source='backbone.Mixed_5c')),
+            bb_s4=dict(type='ModuleOutputs', source='backbone.Mixed_5c'),
+            fc=dict(type='ModuleOutputs', source='cls_head.fc_cls')),
         distill_losses=dict(
-            loss_s4=dict(type='MSELoss', loss_weight=10)),
+            loss_s4=dict(type='MSELoss', loss_weight=10),
+            loss_kl=dict(
+                type='KLDivergence', tau=4, loss_weight=1)),
         loss_forward_mappings=dict(
             loss_s4=dict(
                 s_feature=dict(from_student=True, recorder='bb_s4'),
                 t_feature=dict(from_student=False, recorder='bb_s4')),
+                loss_kl=dict(
+                preds_S=dict(from_student=True, recorder='fc'),
+                preds_T=dict(from_student=False, recorder='fc'))
             )))
 
 find_unused_parameters = True

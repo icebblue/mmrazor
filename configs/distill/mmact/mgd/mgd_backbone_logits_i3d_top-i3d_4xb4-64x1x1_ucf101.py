@@ -3,22 +3,6 @@ _base_ = ['mmaction::/mnt/cephfs/home/zengrunhao/pengying/mmaction2/configs/reco
 student = _base_.model
 teacher_ckpt = '/mnt/cephfs/dataset/m3lab_data-z/pengying/checkpoints/mmaction2/i3d_imagenet-pre_4xb4-64x1x1-100e_ucf101-rgb/best_acc_top1_epoch_64.pth'
 
-student["cls_head"] = dict(
-    type='I3DHeadWithTransfer',
-    num_classes=101,
-    in_channels=1024,
-    spatial_type='avg',
-    dropout_ratio=0.5,
-    init_std=0.01,
-    average_clips='prob',
-    pretrained=teacher_ckpt,
-    freeze_fc=True,
-    transfer_config=dict(
-        type='cnn',
-        s_channels=1024,
-        t_channels=1024,
-        factor=2,))
-
 data_preprocessor=dict(
     type='mmaction.ActionDataPreprocessor',
     mean=[123.675, 116.28, 103.53],
@@ -37,16 +21,32 @@ model = dict(
     distiller=dict(
         type='ConfigurableDistiller',
         student_recorders=dict(
-            bb_s4=dict(type='ModuleOutputs', source='cls_head.transfer'),),
+            bb_s4=dict(type='ModuleOutputs', source='backbone.Mixed_5c'),
+            fc=dict(type='ModuleOutputs', source='cls_head.fc_cls')),
         teacher_recorders=dict(
-            bb_s4=dict(type='ModuleOutputs', source='backbone.Mixed_5c')),
+            bb_s4=dict(type='ModuleOutputs', source='backbone.Mixed_5c'),
+            fc=dict(type='ModuleOutputs', source='cls_head.fc_cls')),
         distill_losses=dict(
-            loss_s4=dict(type='MSELoss', loss_weight=10)),
+            loss_mgd=dict(type='MGDLoss', alpha_mgd=0.00002),
+            loss_kl=dict(type='KLDivergence', tau=4, loss_weight=1)),
+        connectors=dict(
+            loss_mgd_sfeat=dict(
+                type='MGD3DConnector',
+                student_channels=1024,
+                teacher_channels=1024)),
         loss_forward_mappings=dict(
-            loss_s4=dict(
-                s_feature=dict(from_student=True, recorder='bb_s4'),
-                t_feature=dict(from_student=False, recorder='bb_s4')),
-            )))
+            loss_mgd=dict(
+                preds_S=dict(
+                    from_student=True,
+                    recorder='bb_s4',
+                    connector='loss_mgd_sfeat'),
+                preds_T=dict(
+                    from_student=False,
+                    recorder='bb_s4'),),
+                loss_kl=dict(
+                    preds_S=dict(from_student=True, recorder='fc'),
+                    preds_T=dict(from_student=False, recorder='fc')),
+                )))
 
 find_unused_parameters = True
 

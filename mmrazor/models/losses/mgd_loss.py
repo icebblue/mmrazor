@@ -32,7 +32,7 @@ class MGDLoss(nn.Module):
         Return:
             torch.Tensor: The calculated loss value.
         """
-        assert preds_S.shape == preds_T.shape
+        assert preds_S.shape == preds_T.shape,f"{preds_S.shape} != {preds_T.shape}"
         loss = self.get_dis_loss(preds_S, preds_T) * self.alpha_mgd
 
         return loss

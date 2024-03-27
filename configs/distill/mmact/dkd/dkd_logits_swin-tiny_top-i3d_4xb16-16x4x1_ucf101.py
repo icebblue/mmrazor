@@ -1,7 +1,7 @@
-_base_ = ['mmaction::/mnt/cephfs/home/zengrunhao/yangzehang/workplace/mmaction2/configs/recognition/inception_i3d/top-i3d_from-scratch_4xb16-16x4x1-100e_ucf101-rgb.py']
+_base_ = ['mmaction::/mnt/cephfs/home/zengrunhao/pengying/mmaction2/configs/recognition/inception_i3d/top-i3d_from-scratch_4xb16-16x4x1-100e_ucf101-rgb.py']
 
 student = _base_.model
-teacher_ckpt = '/mnt/cephfs/home/zengrunhao/yangzehang/workplace/mmaction2/work_dirs/swin-tiny-p244-w877_k400-pre_4xb4-16x4x1-50e_ucf101-rgb/best_acc_top1_epoch_49.pth'
+teacher_ckpt = '/mnt/cephfs/home/zengrunhao/pengying/mmaction2/work_dirs/swin-tiny-p244-w877_k400-pre_4xb4-16x4x1-50e_ucf101-rgb/best_acc_top1_epoch_49.pth'
 
 data_preprocessor=dict(
     type='mmaction.ActionDataPreprocessor',
@@ -16,7 +16,7 @@ model = dict(
     data_preprocessor=data_preprocessor,
     architecture=student,
     teacher=dict(
-        cfg_path='mmaction::/mnt/cephfs/home/zengrunhao/yangzehang/workplace/mmaction2/configs/recognition/swin/swin-tiny-p244-w877_k400-pre_4xb4-16x4x1-50e_ucf101-rgb.py', pretrained=False),
+        cfg_path='mmaction::/mnt/cephfs/home/zengrunhao/pengying/mmaction2/configs/recognition/swin/swin-tiny-p244-w877_k400-pre_4xb4-16x4x1-50e_ucf101-rgb.py', pretrained=False),
     teacher_ckpt=teacher_ckpt,
     frames_downsample_rate=4,
     is_teacher_downsample=True,
@@ -30,7 +30,7 @@ model = dict(
         distill_losses=dict(
             loss_dkd=dict(
                 type='DKDLoss',
-                tau=4,
+                tau=5,
                 beta=0.5,
                 loss_weight=1,
                 reduction='batchmean')),
