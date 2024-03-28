@@ -31,10 +31,10 @@ model = dict(
             bb_s3=dict(type='ModuleOutputs', source='backbone.layer3.5.conv3.conv'),
             bb_s4=dict(type='ModuleOutputs', source='backbone.layer4.2.conv3.conv')),
         distill_losses=dict(
-            loss_s1=dict(type='ComKDLoss', loss_weight=1, in_channels=256, out_channels=256,),
-            loss_s2=dict(type='ComKDLoss', loss_weight=1, in_channels=512, out_channels=512,),
-            loss_s3=dict(type='ComKDLoss', loss_weight=1, in_channels=1024, out_channels=1024,),
-            loss_s4=dict(type='ComKDLoss', loss_weight=1, in_channels=2048, out_channels=2048,)),
+            loss_s1=dict(type='ComKDLoss', loss_weight=1.0, embed_dim=256, num_heads=1),
+            loss_s2=dict(type='ComKDLoss', loss_weight=1.0, embed_dim=512, num_heads=2),
+            loss_s3=dict(type='ComKDLoss', loss_weight=1.0, embed_dim=1024, num_heads=4),
+            loss_s4=dict(type='ComKDLoss', loss_weight=1.0, embed_dim=2048, num_heads=8)),
         connectors=dict(
             loss_s1_sfeat=dict(type='TransFeatTransfer', in_channel=768, seq_len=1569, t_dim=8, st_size=(8,56,56), embed_dim=256),
             loss_s2_sfeat=dict(type='TransFeatTransfer', in_channel=768, seq_len=1569, t_dim=8, st_size=(8,28,28), embed_dim=512),
