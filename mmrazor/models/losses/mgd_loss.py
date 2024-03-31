@@ -2,9 +2,10 @@
 
 import torch
 import torch.nn as nn
+import torch.nn.functional as F
 
 from mmrazor.registry import MODELS
-
+from einops import rearrange
 
 @MODELS.register_module()
 class MGDLoss(nn.Module):
@@ -32,6 +33,28 @@ class MGDLoss(nn.Module):
         Return:
             torch.Tensor: The calculated loss value.
         """
+        preds_S = rearrange(preds_S, 'b d h w c -> b c d h w').contiguous()
+        preds_T = rearrange(preds_T, 'b d h w c -> b c d h w').contiguous()
+        if preds_S.dim() == 4: # B x C x H x W
+            s_H, t_H = preds_S.size(2), preds_T.size(2)
+
+            if s_H > t_H:
+                preds_S = F.adaptive_avg_pool2d(preds_S, (t_H, t_H))
+            elif s_H < t_H:
+                preds_T = F.adaptive_avg_pool2d(preds_T, (s_H, s_H))
+        elif preds_S.dim() == 5: # B x C x T x H x W
+            s_T, t_T = preds_S.size(2), preds_T.size(2)
+            s_H, t_H = preds_S.size(3), preds_T.size(3)
+
+            if s_H > t_H:
+                preds_S = F.adaptive_avg_pool3d(preds_S, (None, t_H, t_H))
+            elif s_H < t_H:
+                preds_T = F.adaptive_avg_pool3d(preds_T, (None, s_H, s_H))
+
+            if s_T > t_T:
+                preds_S = F.adaptive_avg_pool3d(preds_S, (t_T, None, None))
+            elif s_H < t_H:
+                preds_T = F.adaptive_avg_pool3d(preds_T, (s_T, None, None))
         assert preds_S.shape == preds_T.shape,f"{preds_S.shape} != {preds_T.shape}"
         loss = self.get_dis_loss(preds_S, preds_T) * self.alpha_mgd
 

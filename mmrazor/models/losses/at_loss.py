@@ -27,6 +27,7 @@ class ATLoss(nn.Module):
 
     def forward(self, s_feature: torch.Tensor,
                 t_feature: torch.Tensor) -> torch.Tensor:
+        print("s_feature,t_feature "+ str(s_feature.size()) + " and" +str(t_feature.size()))
         """"Forward function for ATLoss."""
         if s_feature.dim() == 4: # B x C x H x W
             s_H, t_H = s_feature.size(2), t_feature.size(2)
@@ -49,6 +50,7 @@ class ATLoss(nn.Module):
             elif s_H < t_H:
                 t_feature = F.adaptive_avg_pool3d(t_feature, (s_T, None, None))
         
+        print("s_feature,t_feature "+ str(s_feature.size()) + " and" +str(t_feature.size()))
         if s_feature.dim() == 4:
             loss = (self.calc_attention_matrix(s_feature) -
                     self.calc_attention_matrix(t_feature)).pow(2).mean()

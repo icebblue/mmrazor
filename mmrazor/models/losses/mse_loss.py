@@ -4,6 +4,7 @@ import torch.nn as nn
 import torch.nn.functional as F
 
 from mmrazor.registry import MODELS
+from einops import rearrange
 
 
 @MODELS.register_module()
@@ -27,7 +28,10 @@ class MSELoss(nn.Module):
         s_feature: torch.Tensor,
         t_feature: torch.Tensor,
     ) -> torch.Tensor:
-        
+        #print("debug:s_feature,t_feature "+ str(s_feature.size()) + " and" +str(t_feature.size()))
+        s_feature = rearrange(s_feature, 'b d h w c -> b c d h w').contiguous()
+        t_feature = rearrange(t_feature, 'b d h w c -> b c d h w').contiguous()
+        #print("debug:s_feature,t_feature "+ str(s_feature.size()) + " and" +str(t_feature.size()))
         if s_feature.dim() == 4: # B x C x H x W
             s_H, t_H = s_feature.size(2), t_feature.size(2)
 
