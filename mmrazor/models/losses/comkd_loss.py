@@ -14,7 +14,7 @@ class CrossAttention(nn.Module):
                  qk_scale=None,
                  attn_drop=0.,
                  proj_drop=0.,
-                 remove_proj_q_fuse=True):
+                 remove_proj_q_fuse=False):
         super().__init__()
         self.num_heads = num_heads
         head_dim = dim // num_heads
@@ -80,8 +80,9 @@ class ComKDLoss(nn.Module):
         assert s_feature.shape == t_feature.shape
 
         attn = self.cross_attn((t_feature, s_feature))
-        t_feature = t_feature + attn
+        # t_feature = t_feature + attn
 
-        loss = self.loss_mse(s_feature, t_feature)
+        # loss = self.loss_mse(s_feature, t_feature)
+        loss = self.loss_mse(attn, t_feature)
 
         return self.loss_weight * loss
