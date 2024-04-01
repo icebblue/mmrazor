@@ -35,6 +35,8 @@ class MGDLoss(nn.Module):
         """
         preds_S = rearrange(preds_S, 'b d h w c -> b c d h w').contiguous()
         preds_T = rearrange(preds_T, 'b d h w c -> b c d h w').contiguous()
+# s_feature,t_feature torch.Size([4, 768, 8, 7, 7]) torch.Size([4, 768, 2, 7, 7])
+# s_feature,t_feature torch.Size([4, 768, 2, 7, 7]) torch.Size([4, 768, 2, 7, 7])
         if preds_S.dim() == 4: # B x C x H x W
             s_H, t_H = preds_S.size(2), preds_T.size(2)
 

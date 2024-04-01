@@ -31,7 +31,7 @@ class MSELoss(nn.Module):
         #print("debug:s_feature,t_feature "+ str(s_feature.size()) + " and" +str(t_feature.size()))
         s_feature = rearrange(s_feature, 'b d h w c -> b c d h w').contiguous()
         t_feature = rearrange(t_feature, 'b d h w c -> b c d h w').contiguous()
-        #print("debug:s_feature,t_feature "+ str(s_feature.size()) + " and" +str(t_feature.size()))
+        print("s_feature,t_feature "+ str(s_feature.size()) + " " +str(t_feature.size()))
         if s_feature.dim() == 4: # B x C x H x W
             s_H, t_H = s_feature.size(2), t_feature.size(2)
 
@@ -52,6 +52,7 @@ class MSELoss(nn.Module):
                 s_feature = F.adaptive_avg_pool3d(s_feature, (t_T, None, None))
             elif s_H < t_H:
                 t_feature = F.adaptive_avg_pool3d(t_feature, (s_T, None, None))
+        print("s_feature,t_feature "+ str(s_feature.size()) + " " +str(t_feature.size()))
         assert s_feature.size() == t_feature.size(), f"{s_feature.size()} != {t_feature.size()}"
         
         loss = self.loss_mse(s_feature, t_feature)

@@ -193,18 +193,35 @@ class ConfigurableDistiller(BaseDistiller):
                    connector_idx: Optional[int] = None) -> List:
         """According to each item in ``record_infos``, get the corresponding
         record in ``recorder_manager``."""
+#mgd
+# student_recorder:torch.Size([4, 1024, 8, 7, 7])
+# torch.Size([4, 8, 7, 7, 768])
+# teacher_recorder:torch.Size([4, 2, 7, 7, 768])
+# torch.Size([4, 2, 7, 7, 768])
 
+#simkd    
+# student_recorder:torch.Size([4, 8, 7, 7, 768])
+# torch.Size([4, 8, 7, 7, 768])
+# teacher_recorder:torch.Size([4, 2, 7, 7, 768])
+# torch.Size([4, 2, 7, 7, 768])
+        
+#atkd
+# student_recorder:torch.Size([4, 192, 32, 56, 56])
+# torch.Size([4, 192, 32, 56, 56])
+# teacher_recorder:torch.Size([4, 2, 56, 56, 96])
+# torch.Size([4, 96, 2, 56, 56])
         if from_student:
             recorder_ = self.student_recorders.get_recorder(recorder)
+            print("student_recorder:"+str(recorder_.get_record_data(record_idx, data_idx).size()))
         else:
             recorder_ = self.teacher_recorders.get_recorder(recorder)
+            print("teacher_recorder:"+str(recorder_.get_record_data(record_idx, data_idx).size()))
         record_data = recorder_.get_record_data(record_idx, data_idx)
-
         if connector:
             record_data = self.connectors[connector](record_data)
         if connector_idx is not None:
             record_data = record_data[connector_idx]
-
+        print(record_data.size())
         return record_data
 
     def compute_distill_losses(self) -> LossResults:

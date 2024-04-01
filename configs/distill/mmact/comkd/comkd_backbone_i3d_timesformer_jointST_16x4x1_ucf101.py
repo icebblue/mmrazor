@@ -1,0 +1,63 @@
+_base_ = ['mmaction::/mnt/cephfs/home/zengrunhao/yangzehang/workplace/mmaction2/configs/recognition/timesformer/timesformer_jointST_k400-pretrained_1xb64-16x4x1-50e_ucf101-rgb.py']
+
+student = _base_.model
+teacher_ckpt = '/mnt/cephfs/home/zengrunhao/yangzehang/workplace/mmaction2/work_dirs/i3d_k400-pretrained_1xb64-16x4x1-50e_ucf101-rgb/best_acc_top1_epoch_25.pth'
+
+data_preprocessor=dict(
+    type='mmaction.ActionDataPreprocessor',
+    mean=[123.675, 116.28, 103.53],
+    std=[58.395, 57.12, 57.375],
+    format_shape='NCTHW')
+
+model = dict(
+    _scope_='mmrazor',
+    _delete_=True,
+    type='SingleTeacherDistill',
+    data_preprocessor=data_preprocessor,
+    architecture=student,
+    teacher=dict(
+        cfg_path='mmaction::/mnt/cephfs/home/zengrunhao/yangzehang/workplace/mmaction2/configs/recognition/i3d/i3d_k400-pretrained_1xb64-16x4x1-50e_ucf101-rgb.py', pretrained=False),
+    teacher_ckpt=teacher_ckpt,
+    distiller=dict(
+        type='ConfigurableDistiller',
+        student_recorders=dict(
+            bb_s1=dict(type='ModuleOutputs', source='backbone.transformer_layers.layers.1.ffns.0.layers.1'),
+            bb_s2=dict(type='ModuleOutputs', source='backbone.transformer_layers.layers.3.ffns.0.layers.1'),
+            bb_s3=dict(type='ModuleOutputs', source='backbone.transformer_layers.layers.9.ffns.0.layers.1'),
+            bb_s4=dict(type='ModuleOutputs', source='backbone.transformer_layers.layers.11.ffns.0.layers.1')),
+        teacher_recorders=dict(
+            bb_s1=dict(type='ModuleOutputs', source='backbone.layer1.2.conv3.conv'),
+            bb_s2=dict(type='ModuleOutputs', source='backbone.layer2.3.conv3.conv'),
+            bb_s3=dict(type='ModuleOutputs', source='backbone.layer3.5.conv3.conv'),
+            bb_s4=dict(type='ModuleOutputs', source='backbone.layer4.2.conv3.conv')),
+        distill_losses=dict(
+            loss_s1=dict(type='ComKDLoss', loss_weight=1.0, embed_dim=256, num_heads=1),
+            loss_s2=dict(type='ComKDLoss', loss_weight=1.0, embed_dim=512, num_heads=2),
+            loss_s3=dict(type='ComKDLoss', loss_weight=1.0, embed_dim=1024, num_heads=4),
+            loss_s4=dict(type='ComKDLoss', loss_weight=1.0, embed_dim=2048, num_heads=8)),
+        connectors=dict(
+            loss_s1_sfeat=dict(type='TransFeatTransfer', in_channel=768, seq_len=1569, t_dim=8, st_size=(8,56,56), embed_dim=256),
+            loss_s2_sfeat=dict(type='TransFeatTransfer', in_channel=768, seq_len=1569, t_dim=8, st_size=(8,28,28), embed_dim=512),
+            loss_s3_sfeat=dict(type='TransFeatTransfer', in_channel=768, seq_len=1569, t_dim=8, st_size=(8,14,14), embed_dim=1024),
+            loss_s4_sfeat=dict(type='TransFeatTransfer', in_channel=768, seq_len=1569, t_dim=8, st_size=(8,7,7), embed_dim=2048),
+            loss_s1_tfeat=dict(type='CNNFeatTransfer', in_channel=256, st_size=(8,56,56), seq_len=1569, t_dim=8, embed_dim=768, is_student=False),
+            loss_s2_tfeat=dict(type='CNNFeatTransfer', in_channel=512, st_size=(8,28,28), seq_len=1569, t_dim=8, embed_dim=768, is_student=False),
+            loss_s3_tfeat=dict(type='CNNFeatTransfer', in_channel=1024, st_size=(8,14,14), seq_len=1569, t_dim=8, embed_dim=768, is_student=False),
+            loss_s4_tfeat=dict(type='CNNFeatTransfer', in_channel=2048, st_size=(8,7,7), seq_len=1569, t_dim=8, embed_dim=768, is_student=False)),
+        loss_forward_mappings=dict(
+            loss_s1=dict(
+                s_feature=dict(from_student=True, recorder='bb_s1', connector='loss_s1_sfeat'),
+                t_feature=dict(from_student=False, recorder='bb_s1', connector='loss_s1_tfeat')),
+            loss_s2=dict(
+                s_feature=dict(from_student=True, recorder='bb_s2', connector='loss_s2_sfeat'),
+                t_feature=dict(from_student=False, recorder='bb_s2', connector='loss_s2_tfeat')),
+            loss_s3=dict(
+                s_feature=dict(from_student=True, recorder='bb_s3', connector='loss_s3_sfeat'),
+                t_feature=dict(from_student=False, recorder='bb_s3', connector='loss_s3_tfeat')),
+            loss_s4=dict(
+                s_feature=dict(from_student=True, recorder='bb_s4', connector='loss_s4_sfeat'),
+                t_feature=dict(from_student=False, recorder='bb_s4', connector='loss_s4_tfeat')))))
+
+find_unused_parameters = True
+
+val_cfg = dict(_delete_=True, type='mmrazor.SingleTeacherDistillValLoop')

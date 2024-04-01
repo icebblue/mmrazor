@@ -58,8 +58,6 @@ PORT=29666 bash tools/dist_train.sh configs/distill/mmact/atkd/atkd_backbone_log
 
 PORT=29111 nohup bash tools/dist_train.sh configs/distill/mmact/mgd/mgd_backbone_logits_swin-tiny_top-i3d_4xb4-64x1x1_ucf101.py 4 >nohup_3.log 2>&1 &
 
-PORT=29666 bash tools/dist_train.sh configs/distill/mmact/mgd/mgd_backbone_i3d_top-i3d_4xb4-64x1x1_ucf101.py 4 >nohup.log 2>&1
-
 CUDA_VISIBLE_DEVICES=5 PORT=29111 nohup bash tools/dist_train.sh configs/distill/mmact/simkd/simkd_backbone_swin-tiny_top-i3d_4xb4-64x1x1_ucf101.py 1 >nohup_test.log 2>&1 &
 
 PORT=29999 nohup bash  tools/dist_train.sh configs/distill/mmact/simkd/simkd_backbone_i3d_top-i3d_4xb4-64x1x1_ucf101.py 4 >nohup_1.log 2>&1 &
@@ -74,3 +72,5 @@ CUDA_VISIBLE_DEVICES=4,5,6,7 PORT=29111 nohup bash tools/dist_test.sh configs/di
 CUDA_VISIBLE_DEVICES=4,5,6,7 PORT=29111 nohup bash tools/dist_test.sh configs/distill/mmact/mgd/mgd_backbone_i3d_top-i3d_4xb4-64x1x1_ucf101.py ./work_dirs/mgd_backbone_i3d_top-i3d_4xb4-64x1x1_ucf101/best_acc_top1_epoch_93.pth 4 >nohup_test.log 2>&1 &
 
 CUDA_VISIBLE_DEVICES=4,5,6,7 PORT=29111 nohup bash tools/dist_test.sh configs/distill/mmact/simkd/simkd_backbone_i3d_top-i3d_4xb4-64x1x1_ucf101.py ./work_dirs/simkd_backbone_i3d_top-i3d_4xb4-64x1x1_ucf101/best_acc_top1_epoch_67.pth 4 >nohup_test.log 2>&1 &
+
+CUDA_VISIBLE_DEVICES=4,5,6,7 nohup PORT=29666 bash tools/dist_train.sh configs/distill/mmact/comkd/comkd_backbone_i3d_timesformer_jointST_16x4x1_ucf101.py 4 >nohup_1.log 2>&1 &
