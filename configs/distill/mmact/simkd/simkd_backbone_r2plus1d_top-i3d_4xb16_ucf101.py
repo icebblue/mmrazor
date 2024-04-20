@@ -1,12 +1,12 @@
-_base_ = ['mmaction::/mnt/cephfs/home/zengrunhao/pengying/mmaction2/configs/recognition/inception_i3d/top-i3d_from-scratch_4xb4-64x1x1-100e_ucf101-rgb.py']
+_base_ = ['mmaction::/mnt/cephfs/home/zengrunhao/pengying/mmaction2/configs/recognition/inception_i3d/top-i3d_from-scratch_4xb16-16x4x1-100e_ucf101-rgb.py']
 
 student = _base_.model
-teacher_ckpt = '/mnt/cephfs/dataset/m3lab_data-z/pengying/checkpoints/mmaction2/swin-tiny-p244-w877_k400-pre_4xb4-16x4x1-50e_ucf101-rgb/best_acc_top1_epoch_49.pth'
+teacher_ckpt = '/mnt/cephfs/dataset/m3lab_data-z/pengying/checkpoints/mmaction2/r2plus1d_r34_4xb4-32x2x1-100e_ucf101-rgb/best_acc_top1_epoch_92.pth'
 
 student["cls_head"] = dict(
     type='I3DHeadWithTransfer',
     num_classes=101,
-    in_channels=768,
+    in_channels=1024,
     spatial_type='avg',
     dropout_ratio=0.5,
     init_std=0.01,
@@ -14,9 +14,9 @@ student["cls_head"] = dict(
     pretrained=teacher_ckpt,
     freeze_fc=True,
     transfer_config=dict(
-        type='swin',
+        type='cnn',
         s_channels=1024,
-        t_channels=768,
+        t_channels=1024,
         factor=2,))
 
 data_preprocessor=dict(
@@ -28,30 +28,23 @@ data_preprocessor=dict(
 model = dict(
     _scope_='mmrazor',
     _delete_=True,
-    type='HetTeacherDistill',
+    type='SingleTeacherDistill',
     data_preprocessor=data_preprocessor,
     architecture=student,
     teacher=dict(
-        cfg_path='mmaction::/mnt/cephfs/home/zengrunhao/pengying/mmaction2/configs/recognition/swin/swin-tiny-p244-w877_k400-pre_4xb4-16x4x1-50e_ucf101-rgb.py', pretrained=False),
+        cfg_path='mmaction::/mnt/cephfs/home/zengrunhao/pengying/mmaction2/configs/recognition/r2plus1d/r2plus1d_r34_4xb4-32x2x1-100e_ucf101-rgb.py', pretrained=False),
     teacher_ckpt=teacher_ckpt,
-    frames_downsample_rate=4,
-    is_teacher_downsample=True,
     distiller=dict(
         type='ConfigurableDistiller',
         student_recorders=dict(
             bb_s4=dict(type='ModuleOutputs', source='cls_head.transfer'),),
         teacher_recorders=dict(
-            bb_s4=dict(type='ModuleOutputs', source='backbone.layers.3.blocks.1.mlp')),
+            bb_s4=dict(type='ModuleOutputs', source='backbone.layer4.2.conv2.bn')),
         distill_losses=dict(
-            loss_s4=dict(type='MSELoss', loss_weight=0.5)),
-        connectors=dict(
-        loss_simkd_sfeat=dict(
-            type='OrthogonalProjectorConnector',
-            student_channels=1024,
-            teacher_channels=768)),
+            loss_s4=dict(type='MSELoss', loss_weight=10)),
         loss_forward_mappings=dict(
             loss_s4=dict(
-                s_feature=dict(from_student=True, recorder='bb_s4',connector = 'loss_simkd_sfeat'),
+                s_feature=dict(from_student=True, recorder='bb_s4'),
                 t_feature=dict(from_student=False, recorder='bb_s4')),
             )))
 

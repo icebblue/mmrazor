@@ -55,7 +55,7 @@ class MGDLoss(nn.Module):
 
             if s_T > t_T:
                 preds_S = F.adaptive_avg_pool3d(preds_S, (t_T, None, None))
-            elif s_H < t_H:
+            elif s_T < t_T:
                 preds_T = F.adaptive_avg_pool3d(preds_T, (s_T, None, None))
         assert preds_S.shape == preds_T.shape,f"{preds_S.shape} != {preds_T.shape}"
         loss = self.get_dis_loss(preds_S, preds_T) * self.alpha_mgd

@@ -23,34 +23,35 @@ model = dict(
     distiller=dict(
         type='ConfigurableDistiller',
         student_recorders=dict(
-            bb_s1=dict(type='ModuleOutputs', source='backbone.Conv3d_2c_3x3'),
-            bb_s2=dict(type='ModuleOutputs', source='backbone.Mixed_3c'),
-            bb_s3=dict(type='ModuleOutputs', source='backbone.Mixed_4f'),
+            # bb_s1=dict(type='ModuleOutputs', source='backbone.Conv3d_2c_3x3'),
+            # bb_s2=dict(type='ModuleOutputs', source='backbone.Mixed_3c'),
+            # bb_s3=dict(type='ModuleOutputs', source='backbone.Mixed_4f'),
             bb_s4=dict(type='ModuleOutputs', source='backbone.Mixed_5c'),),
         teacher_recorders=dict(
-            bb_s1=dict(type='ModuleOutputs', source='backbone.layers.0.blocks.1.mlp'),
-            bb_s2=dict(type='ModuleOutputs', source='backbone.layers.1.blocks.1.mlp'),
-            bb_s3=dict(type='ModuleOutputs', source='backbone.layers.2.blocks.5.mlp'),
+            # bb_s1=dict(type='ModuleOutputs', source='backbone.layers.0.blocks.1.mlp'),
+            # bb_s2=dict(type='ModuleOutputs', source='backbone.layers.1.blocks.1.mlp'),
+            # bb_s3=dict(type='ModuleOutputs', source='backbone.layers.2.blocks.5.mlp'),
             bb_s4=dict(type='ModuleOutputs', source='backbone.layers.3.blocks.1.mlp')),
         distill_losses=dict(
-            at_loss_s1=dict(type='ATLoss', loss_weight=100),
-            at_loss_s2=dict(type='ATLoss', loss_weight=100),
-            at_loss_s3=dict(type='ATLoss', loss_weight=100),
+            # at_loss_s1=dict(type='ATLoss', loss_weight=100),
+            # at_loss_s2=dict(type='ATLoss', loss_weight=100),
+            # at_loss_s3=dict(type='ATLoss', loss_weight=100),
             at_loss_s4=dict(type='ATLoss', loss_weight=100)),
         connectors=dict(
+            at_lodd_sfeat=dict(type='atkdorthogonal'),
             at_loss_tfeat=dict(type='SwinFeatureProjector')),
         loss_forward_mappings=dict(
-            at_loss_s1=dict(
-                s_feature=dict(from_student=True, recorder='bb_s1'),
-                t_feature=dict(from_student=False, recorder='bb_s1', connector='at_loss_tfeat')),
-            at_loss_s2=dict(
-                s_feature=dict(from_student=True, recorder='bb_s2'),
-                t_feature=dict(from_student=False, recorder='bb_s2', connector='at_loss_tfeat')),
-            at_loss_s3=dict(
-                s_feature=dict(from_student=True, recorder='bb_s3'),
-                t_feature=dict(from_student=False, recorder='bb_s3', connector='at_loss_tfeat')),
+            # at_loss_s1=dict(
+            #     s_feature=dict(from_student=True, recorder='bb_s1', connector='at_lodd_sfeat'),
+            #     t_feature=dict(from_student=False, recorder='bb_s1', connector='at_loss_tfeat')),
+            # at_loss_s2=dict(
+            #     s_feature=dict(from_student=True, recorder='bb_s2', connector='at_lodd_sfeat'),
+            #     t_feature=dict(from_student=False, recorder='bb_s2', connector='at_loss_tfeat')),
+            # at_loss_s3=dict(
+            #     s_feature=dict(from_student=True, recorder='bb_s3', connector='at_lodd_sfeat'),
+            #     t_feature=dict(from_student=False, recorder='bb_s3', connector='at_loss_tfeat')),
             at_loss_s4=dict(
-                s_feature=dict(from_student=True, recorder='bb_s4'),
+                s_feature=dict(from_student=True, recorder='bb_s4', connector='at_lodd_sfeat'),
                 t_feature=dict(from_student=False, recorder='bb_s4', connector='at_loss_tfeat')),
             )))
 

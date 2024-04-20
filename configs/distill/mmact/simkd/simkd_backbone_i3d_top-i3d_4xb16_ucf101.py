@@ -1,7 +1,7 @@
 _base_ = ['mmaction::/mnt/cephfs/home/zengrunhao/pengying/mmaction2/configs/recognition/inception_i3d/top-i3d_from-scratch_4xb16-16x4x1-100e_ucf101-rgb.py']
 
 student = _base_.model
-teacher_ckpt = '/mnt/cephfs/dataset/m3lab_data-z/pengying/checkpoints/mmaction2/i3d_imagenet-pre_4xb16-16x4x1-100e_ucf101-rgb/best_acc_top1_epoch_80.pth'
+teacher_ckpt = '/mnt/cephfs/dataset/m3lab_data-z/pengying/checkpoints/mmaction2/i3d_imagenet-pre_4xb4-64x1x1-100e_ucf101-rgb/best_acc_top1_epoch_64.pth'
 
 student["cls_head"] = dict(
     type='I3DHeadWithTransfer',
@@ -14,6 +14,7 @@ student["cls_head"] = dict(
     pretrained=teacher_ckpt,
     freeze_fc=True,
     transfer_config=dict(
+        type='cnn',
         s_channels=1024,
         t_channels=1024,
         factor=2,))
@@ -31,7 +32,7 @@ model = dict(
     data_preprocessor=data_preprocessor,
     architecture=student,
     teacher=dict(
-        cfg_path='mmaction::/mnt/cephfs/home/zengrunhao/pengying/mmaction2/configs/recognition/inception_i3d/i3d_imagenet-pre_4xb16-16x4x1-100e_ucf101-rgb.py', pretrained=False),
+        cfg_path='mmaction::/mnt/cephfs/home/zengrunhao/pengying/mmaction2/configs/recognition/inception_i3d/i3d_imagenet-pre_4xb4-64x1x1-100e_ucf101-rgb.py', pretrained=False),
     teacher_ckpt=teacher_ckpt,
     distiller=dict(
         type='ConfigurableDistiller',

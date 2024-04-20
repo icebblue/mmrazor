@@ -147,11 +147,15 @@ class MGDSwinConnector(BaseConnector):
             return nn.Conv3d(in_channels, out_channels, kernel_size=1, padding=0, stride=stride, bias=False)
         def conv3x3(in_channels, out_channels, stride=1, groups=1):
             return nn.Conv3d(in_channels, out_channels, kernel_size=3, padding=1, stride=stride, bias=False, groups=groups)
-    
+
+        def orthogonal_projector(in_channels, out_channels):
+            return torch.nn.utils.parametrizations.orthogonal(nn.Linear(in_channels, out_channels, bias=False))
+
+
         self.lambda_mgd = lambda_mgd
         self.mask_on_channel = mask_on_channel
         if student_channels != teacher_channels:
-            self.align = conv1x1(student_channels, teacher_channels)
+            self.align = orthogonal_projector(student_channels, teacher_channels)
         else:
             self.align = None
 
@@ -168,7 +172,9 @@ class MGDSwinConnector(BaseConnector):
         
     def forward_train(self, feature: torch.Tensor) -> torch.Tensor:
         if self.align is not None:
+            feature = rearrange(feature, 'b c d h w -> b d h w c').contiguous()
             feature = self.align(feature)
+            feature = rearrange(feature, 'b d h w c -> b c d h w').contiguous()
 
         N, C, T, H, W = feature.shape
 
@@ -185,3 +191,38 @@ class MGDSwinConnector(BaseConnector):
         masked_fea = torch.mul(feature, mat)
         new_fea = self.transfer(self.generation(masked_fea))
         return new_fea  
+
+@MODELS.register_module()
+class OrthogonalProjectorConnector(BaseConnector):
+    def __init__(
+        self,
+        student_channels: int,
+        teacher_channels: int,
+        init_cfg: Optional[Dict] = None,
+    ) -> None:
+        super().__init__(init_cfg)
+
+        def orthogonal_projector(in_channels, out_channels):
+            return torch.nn.utils.parametrizations.orthogonal(nn.Linear(in_channels, out_channels, bias=False))
+
+        self.align = orthogonal_projector(768, 768)
+
+
+    def forward_train(self, feature: torch.Tensor) -> torch.Tensor:
+        feature = self.align(feature)
+        return feature  
+
+
+@MODELS.register_module()
+class atkdorthogonal(BaseConnector):
+    def __init__(self) -> None:
+        super().__init__()
+
+    def forward_train(self, feature: torch.Tensor) -> torch.Tensor:
+        schannel = feature.size(1)
+        self.align = torch.nn.utils.parametrizations.orthogonal(nn.Linear(schannel, schannel, bias=False).cuda())
+        feature = rearrange(feature, 'b c d h w -> b d h w c').contiguous()
+        feature = self.align(feature)
+        feature = rearrange(feature, 'b c d h w -> b d h w c').contiguous()
+        
+        return feature  

@@ -1,23 +1,7 @@
-_base_ = ['mmaction::/mnt/cephfs/home/zengrunhao/pengying/mmaction2/configs/recognition/inception_i3d/top-i3d_from-scratch_4xb4-64x1x1-100e_ucf101-rgb.py']
+_base_ = ['mmaction::/mnt/cephfs/home/zengrunhao/pengying/mmaction2/configs/recognition/inception_i3d/top-i3d_from-scratch_4xb16-16x4x1-100e_ucf101-rgb.py']
 
 student = _base_.model
 teacher_ckpt = '/mnt/cephfs/dataset/m3lab_data-z/pengying/checkpoints/mmaction2/swin-tiny-p244-w877_k400-pre_4xb4-16x4x1-50e_ucf101-rgb/best_acc_top1_epoch_49.pth'
-
-student["cls_head"] = dict(
-    type='I3DHeadWithTransfer',
-    num_classes=101,
-    in_channels=768,
-    spatial_type='avg',
-    dropout_ratio=0.5,
-    init_std=0.01,
-    average_clips='prob',
-    pretrained=teacher_ckpt,
-    freeze_fc=True,
-    transfer_config=dict(
-        type='swin',
-        s_channels=1024,
-        t_channels=768,
-        factor=2,))
 
 data_preprocessor=dict(
     type='mmaction.ActionDataPreprocessor',
@@ -39,21 +23,24 @@ model = dict(
     distiller=dict(
         type='ConfigurableDistiller',
         student_recorders=dict(
-            bb_s4=dict(type='ModuleOutputs', source='cls_head.transfer'),),
+            bb_s4=dict(type='ModuleOutputs', source='backbone.Mixed_5c')),
         teacher_recorders=dict(
             bb_s4=dict(type='ModuleOutputs', source='backbone.layers.3.blocks.1.mlp')),
-        distill_losses=dict(
-            loss_s4=dict(type='MSELoss', loss_weight=0.5)),
+        distill_losses=dict(loss_mgd=dict(type='MGDLoss', alpha_mgd=0.000002)),
         connectors=dict(
-        loss_simkd_sfeat=dict(
-            type='OrthogonalProjectorConnector',
-            student_channels=1024,
-            teacher_channels=768)),
+            loss_mgd_sfeat=dict(
+                type='MGDSwinConnector',
+                student_channels=1024,
+                teacher_channels=768)),
         loss_forward_mappings=dict(
-            loss_s4=dict(
-                s_feature=dict(from_student=True, recorder='bb_s4',connector = 'loss_simkd_sfeat'),
-                t_feature=dict(from_student=False, recorder='bb_s4')),
-            )))
+            loss_mgd=dict(
+                preds_S=dict(
+                    from_student=True,
+                    recorder='bb_s4',
+                    connector='loss_mgd_sfeat'),
+                preds_T=dict(
+                    from_student=False,
+                    recorder='bb_s4')))))
 
 find_unused_parameters = True
 

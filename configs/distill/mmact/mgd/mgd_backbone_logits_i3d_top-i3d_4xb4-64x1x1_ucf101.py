@@ -28,7 +28,7 @@ model = dict(
             fc=dict(type='ModuleOutputs', source='cls_head.fc_cls')),
         distill_losses=dict(
             loss_mgd=dict(type='MGDLoss', alpha_mgd=0.00002),
-            loss_kl=dict(type='KLDivergence', tau=4, loss_weight=1)),
+            loss_kl=dict(type='KLDivergence', tau=4, loss_weight=0.1)),
         connectors=dict(
             loss_mgd_sfeat=dict(
                 type='MGD3DConnector',

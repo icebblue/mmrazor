@@ -45,9 +45,9 @@ model = dict(
             bb_s4=dict(type='ModuleOutputs', source='backbone.layers.3.blocks.1.mlp'),
             fc=dict(type='ModuleOutputs', source='cls_head.fc_cls')),
         distill_losses=dict(
-            loss_s4=dict(type='MSELoss', loss_weight=0.5),
+            loss_s4=dict(type='MSELoss', loss_weight=10),
             loss_kl=dict(
-                type='KLDivergence', tau=4, loss_weight=1)),
+                type='KLDivergence', tau=4, loss_weight=0.1)),
         loss_forward_mappings=dict(
             loss_s4=dict(
                 s_feature=dict(from_student=True, recorder='bb_s4'),
