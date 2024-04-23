@@ -28,7 +28,7 @@ PORT=29666 nohup python tools/train.py configs/distill/test/js-div_logits_i3d_to
 
 PORT=29888 nohup bash tools/dist_train.sh configs/distill/mmact/simkd/simkd_backbone_swin-tiny_top-i3d_4xb16-16x4x1_ucf101.py 4 >nohup_3.log 2>&1 &
 
-PORT=29333 nohup bash tools/dist_train.sh configs/distill/mmact/ctkd/ctkd_logits_i3d_top-i3d_4xb16_ucf101.py 4 >nohup_5.log 2>&1 &
+PORT=29222 nohup bash tools/dist_train.sh configs/distill/mmact/ctkd/ctkd_logits_r2plus1d_top-i3d_4xb16_ucf101.py 4 >nohup.log 2>&1 &
 
 PORT=29555 nohup bash tools/dist_test.sh configs/distill/mmact/kd/kd_logits_r2plus1d_top-i3d_4xb16_ucf101.py work_dirs/kd_logits_r2plus1d_top-i3d_4xb16_ucf101/best_acc_top1_epoch_95.pth 4 >nohup_test1.log 2>&1 &
 configs/distill/mmact/atkd/atkd_backbone_swin-tiny_top-i3d_4xb16_ucf101.py
