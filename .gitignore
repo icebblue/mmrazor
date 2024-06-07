@@ -122,3 +122,4 @@ venv.bak/
 batchscript-*
 work_dir
 mmdeploy
+mmrazor/models/losses/example_sinkhorn_pointcloud.py

@@ -64,3 +64,28 @@ class MSELoss(nn.Module):
         return self.loss_weight * loss
 
     
+@MODELS.register_module()
+class LogitsMSELoss(nn.Module):
+    """Calculate the two-norm loss between the two features.
+
+    Args:
+        loss_weight (float): Weight of loss. Defaults to 1.0.
+    """
+
+    def __init__(
+        self,
+        loss_weight: float = 1.0,
+    ) -> None:
+        super().__init__()
+        self.loss_mse = nn.MSELoss()
+        self.loss_weight = loss_weight
+
+    def forward(
+        self,
+        preds_S: torch.Tensor,
+        preds_T: torch.Tensor,
+    ) -> torch.Tensor:
+        
+        loss = self.loss_mse(preds_S, preds_T)
+
+        return self.loss_weight * loss

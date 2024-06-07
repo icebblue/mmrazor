@@ -29,3 +29,23 @@ class StopDistillHook(Hook):
 
             runner.logger.info('Distillation has been stopped!')
             model.distillation_stopped = True
+
+@HOOKS.register_module()
+class Swin2I3dHook(Hook):
+
+    def __init__(self, interval=1):
+        self.interval = interval
+
+    def before_train_iter(self, runner, batch_idx, data_batch=None, video_idx =None):
+        """All subclasses should override this method, if they need any
+        operations after each training iteration.
+
+        Args:
+            runner (Runner): The runner of the training process.
+            batch_idx (int): The index of the current batch in the train loop.
+            data_batch (dict or tuple or list, optional): Data from dataloader.
+        """
+        print(f"Batch index: {batch_idx}")
+        print(data_batch.keys())
+        print(data_batch)
+        print("-------------------------------")
